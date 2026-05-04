@@ -10,6 +10,8 @@
 		9884120A2FA91007001606EC /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 988412092FA91007001606EC /* WidgetKit.framework */; };
 		9884120C2FA91007001606EC /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9884120B2FA91007001606EC /* SwiftUI.framework */; };
 		988412172FA91007001606EC /* LunarGlassWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 988412072FA91007001606EC /* LunarGlassWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		988412342FA9264B001606EC /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 988412332FA9264B001606EC /* EventKit.framework */; };
+		988412352FA9265E001606EC /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 988412332FA9264B001606EC /* EventKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,6 +43,7 @@
 		988412072FA91007001606EC /* LunarGlassWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = LunarGlassWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		988412092FA91007001606EC /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		9884120B2FA91007001606EC /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		988412332FA9264B001606EC /* EventKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKit.framework; path = System/Library/Frameworks/EventKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -74,6 +77,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				988412342FA9264B001606EC /* EventKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -82,6 +86,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9884120C2FA91007001606EC /* SwiftUI.framework in Frameworks */,
+				988412352FA9265E001606EC /* EventKit.framework in Frameworks */,
 				9884120A2FA91007001606EC /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -111,6 +116,7 @@
 		988412082FA91007001606EC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				988412332FA9264B001606EC /* EventKit.framework */,
 				988412092FA91007001606EC /* WidgetKit.framework */,
 				9884120B2FA91007001606EC /* SwiftUI.framework */,
 			);
@@ -370,6 +376,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = LunarGlass/LunarGlass.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -377,6 +384,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "LunarGlass uses calendar access to display holidays and events.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -400,6 +408,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = LunarGlass/LunarGlass.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -407,6 +416,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "LunarGlass uses calendar access to display holidays and events.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -430,6 +440,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = LunarGlassWidget/LunarGlassWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_APP_SANDBOX = YES;
@@ -460,6 +471,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = LunarGlassWidget/LunarGlassWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_APP_SANDBOX = YES;

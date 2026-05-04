@@ -9,23 +9,60 @@ import SwiftUI
 import WidgetKit
 
 struct Provider: TimelineProvider {
+    private let calendarService = CalendarService()
+
     func placeholder(in context: Context) -> CalendarEntry {
-        CalendarEntry(date: Date())
+        CalendarEntry(date: Date(), events: [:], holidays: [:], workdays: [])
     }
 
     func getSnapshot(in context: Context, completion: @escaping (CalendarEntry) -> Void) {
-        completion(CalendarEntry(date: Date()))
+        let now = Date()
+        let events = calendarService.fetchEvents(from: startOfMonth(now), to: endOfMonth(now))
+        let holidays = calendarService.fetchHolidays(from: startOfMonth(now), to: endOfMonth(now))
+        let workdays = calendarService.fetchWorkdays(from: startOfMonth(now), to: endOfMonth(now))
+        completion(CalendarEntry(date: now, events: events, holidays: holidays, workdays: workdays))
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<CalendarEntry>) -> Void) {
         let now = Date()
-        let nextMidnight = Calendar.current.startOfDay(for: Calendar.current.date(byAdding: .day, value: 1, to: now) ?? now)
-        completion(Timeline(entries: [CalendarEntry(date: now)], policy: .after(nextMidnight)))
+        let monthStart = startOfMonth(now)
+        let monthEnd = endOfMonth(now)
+
+        let events = calendarService.fetchEvents(from: monthStart, to: monthEnd)
+        let holidays = calendarService.fetchHolidays(from: monthStart, to: monthEnd)
+        let workdays = calendarService.fetchWorkdays(from: monthStart, to: monthEnd)
+
+        let nextMidnight = Calendar.current.startOfDay(
+            for: Calendar.current.date(byAdding: .day, value: 1, to: now) ?? now
+        )
+
+        completion(Timeline(
+            entries: [CalendarEntry(date: now, events: events, holidays: holidays, workdays: workdays)],
+            policy: .after(nextMidnight)
+        ))
+    }
+
+    private func startOfMonth(_ date: Date) -> Date {
+        let cal = Calendar.current
+        let comps = cal.dateComponents([.year, .month], from: date)
+        return cal.date(from: comps) ?? date
+    }
+
+    private func endOfMonth(_ date: Date) -> Date {
+        let cal = Calendar.current
+        guard let start = cal.date(from: cal.dateComponents([.year, .month], from: date)),
+              let end = cal.date(byAdding: DateComponents(month: 1, day: -1), to: start) else {
+            return date
+        }
+        return cal.startOfDay(for: cal.date(byAdding: .day, value: 1, to: end) ?? end)
     }
 }
 
 struct CalendarEntry: TimelineEntry {
     let date: Date
+    let events: [Date: Int]
+    let holidays: [Date: String]
+    let workdays: Set<Date>
 }
 
 struct LunarGlassWidgetEntryView: View {
@@ -37,27 +74,28 @@ struct LunarGlassWidgetEntryView: View {
     private let model = MonthModel()
 
     var body: some View {
-        if family == .systemMedium {
-            mediumBody
-        } else {
-            largeBody
+        Group {
+            if family == .systemMedium {
+                mediumBody
+            } else {
+                largeBody
+            }
         }
     }
 
     private var mediumBody: some View {
-        let month = model.month(for: entry.date)
-        let week = model.week(for: entry.date)
+        let month = model.month(for: entry.date, events: entry.events, holidays: entry.holidays, workdays: entry.workdays)
+        let week = model.week(for: entry.date, events: entry.events, holidays: entry.holidays, workdays: entry.workdays)
 
         return VStack(alignment: .leading, spacing: 12) {
             header(for: month)
             mediumWeekStrip(week)
         }
         .padding(14)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
     private var largeBody: some View {
-        let month = model.month(for: entry.date)
+        let month = model.month(for: entry.date, events: entry.events, holidays: entry.holidays, workdays: entry.workdays)
 
         return VStack(alignment: .leading, spacing: 8) {
             header(for: month)
@@ -65,7 +103,6 @@ struct LunarGlassWidgetEntryView: View {
             calendarGrid(month.days)
         }
         .padding(14)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
     private func header(for month: MonthSnapshot) -> some View {
@@ -73,20 +110,13 @@ struct LunarGlassWidgetEntryView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(month.title)
                     .font(.system(size: family == .systemLarge ? 20 : 18, weight: .semibold))
+                    .foregroundStyle(headerColor)
                 Text(month.subtitle)
                     .font(.system(size: family == .systemLarge ? 10 : 9, weight: .medium))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(secondaryTextColor)
             }
 
             Spacer()
-
-            Text(month.today.dayText)
-                .font(.system(size: family == .systemLarge ? 22 : 20, weight: .semibold, design: .rounded))
-                .monospacedDigit()
-                .foregroundStyle(todayAccent)
-                .padding(.horizontal, 9)
-                .padding(.vertical, 4)
-                .background(Capsule().fill(todayAccent.opacity(colorScheme == .dark ? 0.14 : 0.1)))
         }
     }
 
@@ -104,29 +134,39 @@ struct LunarGlassWidgetEntryView: View {
         VStack(spacing: 5) {
             Text(day.weekdayText)
                 .font(.system(size: 10, weight: .semibold))
-                .foregroundStyle(day.isWeekend ? weekendColor : .secondary)
+                .foregroundStyle(day.isWeekend ? weekendColor : secondaryTextColor)
 
             Text(day.dayText)
                 .font(.system(size: day.isToday ? 21 : 18, weight: day.isToday ? .bold : .semibold, design: .rounded))
                 .monospacedDigit()
-                .foregroundStyle(day.isToday ? .white : dayTextColor(day))
+                .foregroundStyle(day.isToday ? Color.white : dayTextColor(day))
                 .frame(width: 34, height: 34)
                 .background(
                     Circle()
                         .fill(day.isToday ? todayAccent : .clear)
                 )
 
-            Text(day.note)
-                .font(.system(size: 9, weight: .medium))
-                .lineLimit(1)
-                .minimumScaleFactor(0.75)
-                .foregroundStyle(day.isHoliday ? weekendColor : .secondary)
+            if day.eventCount > 0 {
+                eventDots(count: day.eventCount)
+            }
+
+            if day.isWorkday {
+                Text("班")
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundStyle(todayAccent)
+            } else {
+                Text(day.note)
+                    .font(.system(size: 9, weight: .medium))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+                    .foregroundStyle(day.isHoliday ? weekendColor : secondaryTextColor)
+            }
         }
         .frame(maxWidth: .infinity, minHeight: 76)
         .padding(.vertical, 6)
         .background(
             RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(day.isToday ? todayAccent.opacity(colorScheme == .dark ? 0.12 : 0.08) : .white.opacity(colorScheme == .dark ? 0.035 : 0.08))
+                .fill(day.isToday ? todayAccent.opacity(0.10) : Color.clear)
         )
     }
 
@@ -136,7 +176,7 @@ struct LunarGlassWidgetEntryView: View {
                 ForEach(MonthModel.weekdays, id: \.self) { weekday in
                     Text(weekday)
                         .font(.system(size: 11, weight: .semibold))
-                        .foregroundStyle(weekday == "六" || weekday == "日" ? weekendColor : .secondary)
+                        .foregroundStyle(weekday == "六" || weekday == "日" ? weekendColor : secondaryTextColor)
                         .frame(maxWidth: .infinity)
                 }
             }
@@ -166,22 +206,58 @@ struct LunarGlassWidgetEntryView: View {
                 .background(todayBackground(for: day))
                 .foregroundStyle(dayTextColor(day))
 
-            Text(day.note)
-                .font(.system(size: family == .systemLarge ? 9 : 7, weight: .medium))
-                .lineLimit(1)
-                .minimumScaleFactor(0.75)
-                .foregroundStyle(day.isCurrentMonth ? noteColor(day) : .secondary.opacity(0.32))
-                .frame(maxWidth: .infinity)
+            if day.eventCount > 0 {
+                eventDots(count: day.eventCount)
+            }
+
+            if day.isWorkday {
+                Text("班")
+                    .font(.system(size: family == .systemLarge ? 9 : 7, weight: .bold))
+                    .foregroundStyle(todayAccent)
+                    .frame(maxWidth: .infinity)
+            } else {
+                Text(day.note)
+                    .font(.system(size: family == .systemLarge ? 9 : 7, weight: .medium))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+                    .foregroundStyle(day.isCurrentMonth ? noteColor(day) : mutedTextColor)
+                    .frame(maxWidth: .infinity)
+            }
         }
-        .opacity(day.isCurrentMonth ? 1 : 0.36)
+        .opacity(day.isCurrentMonth ? 1 : 0.42)
     }
 
     private var weekendColor: Color {
-        Color(red: 0.9, green: 0.36, blue: 0.28)
+        todayAccent
     }
 
     private var todayAccent: Color {
-        Color(red: 0.95, green: 0.32, blue: 0.28)
+        let defaults = UserDefaults(suiteName: "group.com.york.LunarGlass")
+        let style = defaults?.string(forKey: "accentStyle") ?? ""
+        switch style {
+        case "vermilion":
+            return Color(red: 1.0, green: 0.36, blue: 0.32)
+        case "gold":
+            return Color(red: 0.94, green: 0.65, blue: 0.22)
+        default:
+            return Color(red: 0.15, green: 0.68, blue: 0.54)
+        }
+    }
+
+    private var headerColor: Color {
+        .primary
+    }
+
+    private var bodyTextColor: Color {
+        .primary
+    }
+
+    private var secondaryTextColor: Color {
+        .secondary
+    }
+
+    private var mutedTextColor: Color {
+        .secondary.opacity(0.4)
     }
 
     private func dayTextColor(_ day: DaySnapshot) -> Color {
@@ -189,21 +265,27 @@ struct LunarGlassWidgetEntryView: View {
             return .white
         }
 
-        if day.isWeekend {
-            return weekendColor
-        }
-
-        return .primary
+        return bodyTextColor
     }
 
     private func noteColor(_ day: DaySnapshot) -> Color {
-        day.isHoliday ? weekendColor : .secondary
+        day.isHoliday ? todayAccent : secondaryTextColor
     }
 
     @ViewBuilder
     private func todayBackground(for day: DaySnapshot) -> some View {
         if day.isToday {
             Circle().fill(todayAccent)
+        }
+    }
+
+    private func eventDots(count: Int) -> some View {
+        HStack(spacing: 3) {
+            ForEach(0..<min(count, 3), id: \.self) { _ in
+                Circle()
+                    .fill(todayAccent)
+                    .frame(width: 4, height: 4)
+            }
         }
     }
 }
@@ -234,168 +316,29 @@ struct LunarGlassWidget: Widget {
 private struct WidgetBackground: View {
     var body: some View {
         ZStack {
+            Rectangle()
+                .fill(.thinMaterial)
+
             LinearGradient(
                 colors: [
-                    Color(red: 0.08, green: 0.09, blue: 0.16),
-                    Color(red: 0.13, green: 0.16, blue: 0.28),
-                    Color(red: 0.09, green: 0.10, blue: 0.14)
+                    Color(red: 0.56, green: 0.54, blue: 0.72).opacity(0.10),
+                    Color(red: 0.48, green: 0.50, blue: 0.68).opacity(0.06)
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
-
-            Rectangle()
-                .fill(.ultraThinMaterial)
-                .opacity(0.42)
         }
-    }
-}
-
-private struct MonthModel {
-    static let weekdays = ["一", "二", "三", "四", "五", "六", "日"]
-
-    private var calendar: Calendar {
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.locale = Locale(identifier: "zh_CN")
-        calendar.firstWeekday = 2
-        return calendar
-    }
-
-    private let lunarCalendar = Calendar(identifier: .chinese)
-
-    func month(for date: Date) -> MonthSnapshot {
-        let calendar = calendar
-        let startOfToday = calendar.startOfDay(for: date)
-        let components = calendar.dateComponents([.year, .month], from: date)
-        let firstDay = calendar.date(from: components) ?? startOfToday
-        let weekdayOffset = (calendar.component(.weekday, from: firstDay) + 5) % 7
-        let gridStart = calendar.date(byAdding: .day, value: -weekdayOffset, to: firstDay) ?? firstDay
-        let currentMonth = calendar.component(.month, from: date)
-
-        let days = (0..<42).map { index in
-            let day = calendar.date(byAdding: .day, value: index, to: gridStart) ?? gridStart
-            return snapshot(for: day, currentMonth: currentMonth, today: startOfToday)
-        }
-
-        let today = snapshot(for: startOfToday, currentMonth: currentMonth, today: startOfToday)
-        let title = "\(calendar.component(.year, from: date))年\(calendar.component(.month, from: date))月"
-
-        return MonthSnapshot(
-            title: title,
-            subtitle: "\(today.lunarMonthText)\(today.note)",
-            days: days,
-            today: today
-        )
-    }
-
-    func week(for date: Date) -> [DaySnapshot] {
-        let calendar = calendar
-        let startOfToday = calendar.startOfDay(for: date)
-        let weekdayOffset = (calendar.component(.weekday, from: startOfToday) + 5) % 7
-        let weekStart = calendar.date(byAdding: .day, value: -weekdayOffset, to: startOfToday) ?? startOfToday
-        let currentMonth = calendar.component(.month, from: date)
-
-        return (0..<7).map { index in
-            let day = calendar.date(byAdding: .day, value: index, to: weekStart) ?? weekStart
-            return snapshot(for: day, currentMonth: currentMonth, today: startOfToday)
-        }
-    }
-
-    private func snapshot(for date: Date, currentMonth: Int, today: Date) -> DaySnapshot {
-        let calendar = calendar
-        let lunar = lunarCalendar.dateComponents([.month, .day, .isLeapMonth], from: date)
-        let solarMonth = calendar.component(.month, from: date)
-        let solarDay = calendar.component(.day, from: date)
-        let weekday = calendar.component(.weekday, from: date)
-        let lunarMonth = lunar.month ?? 1
-        let lunarDay = lunar.day ?? 1
-        let isLeapMonth = lunar.isLeapMonth ?? false
-        let solarHoliday = Self.solarHolidays["\(solarMonth)-\(solarDay)"]
-        let lunarHoliday = isLeapMonth ? nil : Self.lunarHolidays["\(lunarMonth)-\(lunarDay)"]
-        let note = solarHoliday ?? lunarHoliday ?? lunarDayName(lunarDay)
-
-        return DaySnapshot(
-            date: date,
-            dayText: "\(solarDay)",
-            note: note,
-            lunarMonthText: lunarMonthName(lunarMonth),
-            isToday: calendar.isDate(date, inSameDayAs: today),
-            isCurrentMonth: solarMonth == currentMonth,
-            isWeekend: weekday == 1 || weekday == 7,
-            isHoliday: solarHoliday != nil || lunarHoliday != nil
-        )
-    }
-
-    private func lunarDayName(_ day: Int) -> String {
-        let names = [
-            "初一", "初二", "初三", "初四", "初五", "初六", "初七", "初八", "初九", "初十",
-            "十一", "十二", "十三", "十四", "十五", "十六", "十七", "十八", "十九", "二十",
-            "廿一", "廿二", "廿三", "廿四", "廿五", "廿六", "廿七", "廿八", "廿九", "三十"
-        ]
-
-        return names.indices.contains(day - 1) ? names[day - 1] : ""
-    }
-
-    private func lunarMonthName(_ month: Int) -> String {
-        let names = ["正月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "冬月", "腊月"]
-        return names.indices.contains(month - 1) ? names[month - 1] : ""
-    }
-
-    private static let solarHolidays = [
-        "1-1": "元旦",
-        "2-14": "情人",
-        "5-1": "劳动",
-        "10-1": "国庆",
-        "12-25": "圣诞"
-    ]
-
-    private static let lunarHolidays = [
-        "1-1": "春节",
-        "1-15": "元宵",
-        "5-5": "端午",
-        "7-7": "七夕",
-        "8-15": "中秋",
-        "9-9": "重阳",
-        "12-8": "腊八"
-    ]
-}
-
-private struct MonthSnapshot {
-    let title: String
-    let subtitle: String
-    let days: [DaySnapshot]
-    let today: DaySnapshot
-}
-
-private struct DaySnapshot {
-    let date: Date
-    let dayText: String
-    let note: String
-    let lunarMonthText: String
-    let isToday: Bool
-    let isCurrentMonth: Bool
-    let isWeekend: Bool
-    let isHoliday: Bool
-
-    var detail: String {
-        "\(lunarMonthText)\(note)"
-    }
-
-    var weekdayText: String {
-        let weekday = Calendar.current.component(.weekday, from: date)
-        let names = ["日", "一", "二", "三", "四", "五", "六"]
-        return names[weekday - 1]
     }
 }
 
 #Preview(as: .systemMedium) {
     LunarGlassWidget()
 } timeline: {
-    CalendarEntry(date: Date())
+    CalendarEntry(date: Date(), events: [:], holidays: [:], workdays: [])
 }
 
 #Preview(as: .systemLarge) {
     LunarGlassWidget()
 } timeline: {
-    CalendarEntry(date: Date())
+    CalendarEntry(date: Date(), events: [:], holidays: [:], workdays: [])
 }

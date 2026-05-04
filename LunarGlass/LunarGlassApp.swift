@@ -6,12 +6,21 @@
 //
 
 import SwiftUI
+import EventKit
 
 @main
 struct LunarGlassApp: App {
+    private let store = EKEventStore()
+
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .task {
+                    let status = EKEventStore.authorizationStatus(for: .event)
+                    if status == .notDetermined {
+                        _ = try? await store.requestFullAccessToEvents()
+                    }
+                }
         }
     }
 }
