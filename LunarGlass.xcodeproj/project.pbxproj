@@ -6,14 +6,65 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		9884120A2FA91007001606EC /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 988412092FA91007001606EC /* WidgetKit.framework */; };
+		9884120C2FA91007001606EC /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9884120B2FA91007001606EC /* SwiftUI.framework */; };
+		988412172FA91007001606EC /* LunarGlassWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 988412072FA91007001606EC /* LunarGlassWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		988412152FA91007001606EC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 988411ED2FA90E57001606EC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 988412062FA91007001606EC;
+			remoteInfo = LunarGlassWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		9884121C2FA91007001606EC /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				988412172FA91007001606EC /* LunarGlassWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		988411F52FA90E57001606EC /* LunarGlass.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LunarGlass.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		988412072FA91007001606EC /* LunarGlassWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = LunarGlassWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		988412092FA91007001606EC /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		9884120B2FA91007001606EC /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		988412182FA91007001606EC /* Exceptions for "LunarGlassWidget" folder in "LunarGlassWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 988412062FA91007001606EC /* LunarGlassWidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		988411F72FA90E57001606EC /* LunarGlass */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = LunarGlass;
+			sourceTree = "<group>";
+		};
+		9884120D2FA91007001606EC /* LunarGlassWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				988412182FA91007001606EC /* Exceptions for "LunarGlassWidget" folder in "LunarGlassWidgetExtension" target */,
+			);
+			path = LunarGlassWidget;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -26,6 +77,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		988412042FA91007001606EC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9884120C2FA91007001606EC /* SwiftUI.framework in Frameworks */,
+				9884120A2FA91007001606EC /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -33,6 +93,8 @@
 			isa = PBXGroup;
 			children = (
 				988411F72FA90E57001606EC /* LunarGlass */,
+				9884120D2FA91007001606EC /* LunarGlassWidget */,
+				988412082FA91007001606EC /* Frameworks */,
 				988411F62FA90E57001606EC /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,8 +103,18 @@
 			isa = PBXGroup;
 			children = (
 				988411F52FA90E57001606EC /* LunarGlass.app */,
+				988412072FA91007001606EC /* LunarGlassWidgetExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		988412082FA91007001606EC /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				988412092FA91007001606EC /* WidgetKit.framework */,
+				9884120B2FA91007001606EC /* SwiftUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -55,10 +127,12 @@
 				988411F12FA90E57001606EC /* Sources */,
 				988411F22FA90E57001606EC /* Frameworks */,
 				988411F32FA90E57001606EC /* Resources */,
+				9884121C2FA91007001606EC /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				988412162FA91007001606EC /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				988411F72FA90E57001606EC /* LunarGlass */,
@@ -69,6 +143,28 @@
 			productName = LunarGlass;
 			productReference = 988411F52FA90E57001606EC /* LunarGlass.app */;
 			productType = "com.apple.product-type.application";
+		};
+		988412062FA91007001606EC /* LunarGlassWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 988412192FA91007001606EC /* Build configuration list for PBXNativeTarget "LunarGlassWidgetExtension" */;
+			buildPhases = (
+				988412032FA91007001606EC /* Sources */,
+				988412042FA91007001606EC /* Frameworks */,
+				988412052FA91007001606EC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				9884120D2FA91007001606EC /* LunarGlassWidget */,
+			);
+			name = LunarGlassWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = LunarGlassWidgetExtension;
+			productReference = 988412072FA91007001606EC /* LunarGlassWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -81,6 +177,9 @@
 				LastUpgradeCheck = 2640;
 				TargetAttributes = {
 					988411F42FA90E57001606EC = {
+						CreatedOnToolsVersion = 26.4.1;
+					};
+					988412062FA91007001606EC = {
 						CreatedOnToolsVersion = 26.4.1;
 					};
 				};
@@ -100,12 +199,20 @@
 			projectRoot = "";
 			targets = (
 				988411F42FA90E57001606EC /* LunarGlass */,
+				988412062FA91007001606EC /* LunarGlassWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		988411F32FA90E57001606EC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		988412052FA91007001606EC /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -122,7 +229,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		988412032FA91007001606EC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		988412162FA91007001606EC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 988412062FA91007001606EC /* LunarGlassWidgetExtension */;
+			targetProxy = 988412152FA91007001606EC /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		988411FE2FA90E58001606EC /* Debug */ = {
@@ -303,6 +425,66 @@
 			};
 			name = Release;
 		};
+		9884121A2FA91007001606EC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LunarGlassWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = LunarGlassWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.york.LunarGlass.LunarGlassWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		9884121B2FA91007001606EC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LunarGlassWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = LunarGlassWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.york.LunarGlass.LunarGlassWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -320,6 +502,15 @@
 			buildConfigurations = (
 				988412012FA90E58001606EC /* Debug */,
 				988412022FA90E58001606EC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		988412192FA91007001606EC /* Build configuration list for PBXNativeTarget "LunarGlassWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9884121A2FA91007001606EC /* Debug */,
+				9884121B2FA91007001606EC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
