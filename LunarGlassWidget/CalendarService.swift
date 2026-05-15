@@ -5,7 +5,7 @@ struct CalendarService {
     private let store = EKEventStore()
 
     func fetchEvents(from start: Date, to end: Date) -> [Date: Int] {
-        guard authorizationStatus == .authorized else {
+        guard authorizationStatus == .fullAccess else {
             return [:]
         }
 
@@ -31,7 +31,7 @@ struct CalendarService {
     }
 
     func fetchHolidays(from start: Date, to end: Date) -> [Date: String] {
-        guard authorizationStatus == .authorized else {
+        guard authorizationStatus == .fullAccess else {
             return [:]
         }
 
@@ -58,7 +58,7 @@ struct CalendarService {
     }
 
     func fetchWorkdays(from start: Date, to end: Date) -> Set<Date> {
-        guard authorizationStatus == .authorized else {
+        guard authorizationStatus == .fullAccess else {
             return []
         }
 

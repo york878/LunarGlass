@@ -51,10 +51,10 @@ struct Provider: TimelineProvider {
     private func endOfMonth(_ date: Date) -> Date {
         let cal = Calendar.current
         guard let start = cal.date(from: cal.dateComponents([.year, .month], from: date)),
-              let end = cal.date(byAdding: DateComponents(month: 1, day: -1), to: start) else {
+              let nextMonth = cal.date(byAdding: .month, value: 1, to: start) else {
             return date
         }
-        return cal.startOfDay(for: cal.date(byAdding: .day, value: 1, to: end) ?? end)
+        return nextMonth
     }
 }
 

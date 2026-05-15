@@ -7,6 +7,7 @@
 
 import SwiftUI
 import EventKit
+import WidgetKit
 
 struct ContentView: View {
     @AppStorage("accentStyle") private var accentStyle = AccentStyle.jade.rawValue
@@ -61,18 +62,9 @@ struct ContentView: View {
             }
             .background(appBackdrop)
         }
-        .task {
-            let status = EKEventStore.authorizationStatus(for: .event)
-            if status == .notDetermined {
-                await withCheckedContinuation { continuation in
-                    EKEventStore().requestAccess(to: .event) { _, _ in
-                        continuation.resume()
-                    }
-                }
-            }
-        }
         .onChange(of: accentStyle) {
             sharedDefaults?.set(accentStyle, forKey: "accentStyle")
+            WidgetCenter.shared.reloadAllTimelines()
         }
         .task {
             sharedDefaults?.set(accentStyle, forKey: "accentStyle")
@@ -325,7 +317,7 @@ private enum AccentStyle: String, CaseIterable, Identifiable {
     var color: Color {
         switch self {
         case .vermilion:
-            Color(red: 0.95, green: 0.32, blue: 0.28)
+            Color(red: 1.0, green: 0.36, blue: 0.32)
         case .jade:
             Color(red: 0.15, green: 0.68, blue: 0.54)
         case .gold:

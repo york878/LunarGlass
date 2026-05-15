@@ -10,23 +10,22 @@ import Foundation
 struct MonthModel {
     static let weekdays = ["一", "二", "三", "四", "五", "六", "日"]
 
-    private var calendar: Calendar {
+    private let calendar: Calendar = {
         var calendar = Calendar(identifier: .gregorian)
         calendar.locale = Locale(identifier: "zh_CN")
         calendar.timeZone = .current
         calendar.firstWeekday = 2
         return calendar
-    }
+    }()
 
-    private var lunarCalendar: Calendar {
+    private let lunarCalendar: Calendar = {
         var calendar = Calendar(identifier: .chinese)
         calendar.locale = Locale(identifier: "zh_CN")
         calendar.timeZone = .current
         return calendar
-    }
+    }()
 
     func month(for date: Date, events: [Date: Int] = [:], holidays: [Date: String] = [:], workdays: Set<Date> = []) -> MonthSnapshot {
-        let calendar = calendar
         let startOfToday = calendar.startOfDay(for: date)
         let components = calendar.dateComponents([.year, .month], from: date)
         let firstDay = calendar.date(from: components) ?? startOfToday
@@ -51,7 +50,6 @@ struct MonthModel {
     }
 
     func week(for date: Date, events: [Date: Int] = [:], holidays: [Date: String] = [:], workdays: Set<Date> = []) -> [DaySnapshot] {
-        let calendar = calendar
         let startOfToday = calendar.startOfDay(for: date)
         let weekdayOffset = (calendar.component(.weekday, from: startOfToday) + 5) % 7
         let weekStart = calendar.date(byAdding: .day, value: -weekdayOffset, to: startOfToday) ?? startOfToday
@@ -64,8 +62,6 @@ struct MonthModel {
     }
 
     private func snapshot(for date: Date, currentMonth: Int, today: Date, events: [Date: Int], holidays: [Date: String], workdays: Set<Date>) -> DaySnapshot {
-        let calendar = calendar
-        let lunarCalendar = lunarCalendar
         let lunar = lunarCalendar.dateComponents([.month, .day, .isLeapMonth], from: date)
         let solarMonth = calendar.component(.month, from: date)
         let solarDay = calendar.component(.day, from: date)

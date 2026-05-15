@@ -6,5 +6,9 @@
 	<true/>
 	<key>com.apple.security.personal-information.calendars</key>
 	<true/>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.com.york.LunarGlass</string>
+	</array>
 </dict>
 </plist>
